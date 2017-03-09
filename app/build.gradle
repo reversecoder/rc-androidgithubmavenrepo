@@ -1,10 +1,20 @@
 apply plugin: 'com.android.application'
+apply plugin: 'maven'
+
+repositories {
+    maven { url "https://raw.github.com/synergian/wagon-git/releases" }
+}
+
+configurations {
+    deployLibrary
+}
+
 repositories {
     maven {
-        url "https://raw.github.com/reversecoder/rc-githubmavenrepoandroid/releases"
+        url "https://raw.github.com/reversecoder/rc-samplelibrary-androidstudio/releases"
     }
     maven {
-        url "https://raw.github.com/reversecoder/rc-githubmavenrepoandroid/snapshots"
+        url "https://raw.github.com/reversecoder/rc-samplelibrary-androidstudio/snapshots"
     }
 }
 
@@ -13,7 +23,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "com.reversecoder.githubmavenrepo"
+        applicationId "com.reversecoder.publicgithubmavenrepo.androidstudio"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
@@ -32,5 +42,25 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:23.0.0'
-//    compile 'com.reversecoder.githubmavenrepo.android:androidview:1.0.0-SNAPSHOT'
+    deployLibrary "ar.com.synergian:wagon-git:0.3.0"
+
+    compile 'com.reversecoder.samplelibrary.androidstudio:rc-samplelibrary-androidstudio:1.0.0-SNAPSHOT'
+}
+
+uploadArchives {
+
+    repositories.mavenDeployer {
+        configuration = configurations.deployLibrary
+        repository(url: 'git:releases://git@github.com:reversecoder/rc-public-githubmavenrepo-androidstudio.git')
+        snapshotRepository(url: 'git:snapshots://git@github.com:reversecoder/rc-public-githubmavenrepo-androidstudio.git')
+
+        uniqueVersion = true
+
+        pom.project {
+            groupId = 'com.reversecoder.publicgithubmavenrepo.androidstudio'
+            version = '1.0.0-SNAPSHOT'
+            artifactId = 'rc-public-githubmavenrepo-androidstudio'
+            packaging 'aar'
+        }
+    }
 }
